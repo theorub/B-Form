@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Lieferadresse</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  body {
+    margin: 0;
+    padding: 20px 16px 100px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #111111);
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+  p.hint {
+    margin: 0 0 20px;
+    color: var(--tg-theme-hint-color, #888888);
+    font-size: 14px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 16px 0 6px;
+    color: var(--tg-theme-hint-color, #666666);
+  }
+  input, textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--tg-theme-hint-color, #cccccc);
+    background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+    color: var(--tg-theme-text-color, #111111);
+    font-size: 16px;
+    font-family: inherit;
+  }
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888888'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+  }
+  .row > div {
+    flex: 1;
+  }
+  .row > div.city {
+    flex: 2;
+  }
+  .error {
+    color: #e53935;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+  <h1>📍 Lieferadresse</h1>
+  <p class="hint">Bitte gib an, wohin geliefert werden soll.</p>
+
+  <div class="row">
+    <div>
+      <label for="nachname">Name</label>
+      <input id="nachname" type="text" autocomplete="family-name">
+    </div>
+    <div>
+      <label for="vorname">Vorname</label>
+      <input id="vorname" type="text" autocomplete="given-name">
+    </div>
+  </div>
+
+  <label for="street">Strasse und Hausnummer</label>
+  <input id="street" type="text" autocomplete="street-address">
+
+  <div class="row">
+    <div>
+      <label for="zip">PLZ</label>
+      <input id="zip" type="text" inputmode="numeric" autocomplete="postal-code">
+    </div>
+    <div class="city">
+      <label for="city">Ort</label>
+      <input id="city" type="text" autocomplete="address-level2">
+    </div>
+  </div>
+
+  <label for="land">Land</label>
+  <select id="land">
+    <option value="Schweiz" selected>Schweiz</option>
+  </select>
+
+  <label for="notes">Hinweise (optional)</label>
+  <textarea id="notes" rows="2" placeholder="z.B. Stockwerk, Klingelname"></textarea>
+
+  <div class="error" id="error"></div>
+
+<script>
+  var tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+
+  var nachname = document.getElementById('nachname');
+  var vorname = document.getElementById('vorname');
+  var street = document.getElementById('street');
+  var zip = document.getElementById('zip');
+  var city = document.getElementById('city');
+  var land = document.getElementById('land');
+  var notes = document.getElementById('notes');
+  var errorEl = document.getElementById('error');
+
+  function isValid() {
+    return nachname.value.trim() && vorname.value.trim() && street.value.trim()
+      && zip.value.trim() && city.value.trim();
+  }
+
+  function updateButton() {
+    errorEl.textContent = '';
+    if (isValid()) {
+      tg.MainButton.enable();
+    } else {
+      tg.MainButton.disable();
+    }
+  }
+
+  [nachname, vorname, street, zip, city, notes].forEach(function (el) {
+    el.addEventListener('input', updateButton);
+  });
+
+  tg.MainButton.setText('Adresse speichern');
+  tg.MainButton.show();
+  tg.MainButton.disable();
+
+  tg.MainButton.onClick(function () {
+    if (!isValid()) {
+      errorEl.textContent = 'Bitte Name, Vorname, Strasse, PLZ und Ort ausfuellen.';
+      return;
+    }
+    var data = {
+      name: nachname.value.trim(),
+      vorname: vorname.value.trim(),
+      street: street.value.trim(),
+      zip: zip.value.trim(),
+      city: city.value.trim(),
+      land: land.value,
+      notes: notes.value.trim()
+    };
+    tg.sendData(JSON.stringify(data));
+  });
+</script>
+</body>
+</html>
