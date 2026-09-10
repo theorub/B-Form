@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Preisliste</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  body {
+    margin: 0;
+    padding: 20px 16px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #111111);
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+  }
+  p.hint {
+    margin: 0 0 20px;
+    color: var(--tg-theme-hint-color, #888888);
+    font-size: 14px;
+  }
+  .card {
+    background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .card .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .card h3 {
+    margin: 0;
+    font-size: 16px;
+  }
+  .card .price {
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .card .sold-out {
+    color: #e53935;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .card p.desc {
+    margin: 6px 0 0;
+    color: var(--tg-theme-hint-color, #666666);
+    font-size: 14px;
+  }
+  .card .tiers {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--tg-theme-hint-color, #dddddd);
+    font-size: 13px;
+    color: var(--tg-theme-hint-color, #666666);
+  }
+  .card .tiers span {
+    display: inline-block;
+    margin-right: 12px;
+  }
+  #empty {
+    color: var(--tg-theme-hint-color, #888888);
+    font-size: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <h1>📋 Preisliste</h1>
+  <p class="hint">Aktuelle Preise auf einen Blick.</p>
+
+  <div id="list"></div>
+  <p id="empty">Preisliste konnte nicht geladen werden.</p>
+
+<script>
+  var tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();
+
+  function parsePreis(raw) {
+    return parseFloat(raw.replace(',', '.').replace('Fr.', '').trim());
+  }
+
+  function fmtPreis(n) {
+    return 'Fr. ' + n.toFixed(2);
+  }
+
+  function parseProdukte(text) {
+    var blocks = [];
+    var current = {};
+    var lines = text.split('\n');
+    lines.forEach(function (rawLine) {
+      var line = rawLine.trim();
+      if (!line || line.startsWith('#')) {
+        if (Object.keys(current).length) {
+          blocks.push(current);
+          current = {};
+        }
+        return;
+      }
+      var idx = line.indexOf(':');
+      if (idx === -1) return;
+      var key = line.slice(0, idx).trim().toLowerCase();
+      var value = line.slice(idx + 1).trim();
+      if (key === 'name') current.name = value;
+      else if (key === 'preis') current.preis = parsePreis(value);
+      else if (key === 'beschreibung') current.beschreibung = value;
+      else if (key === 'mengenrabatt') {
+        current.tiers = value.split(',').map(function (part) {
+          var pieces = part.split(':');
+          return { menge: pieces[0].trim(), preis: parsePreis(pieces[1]) };
+        });
+      }
+    });
+    if (Object.keys(current).length) blocks.push(current);
+    return blocks;
+  }
+
+  function render(produkte) {
+    var list = document.getElementById('list');
+    if (!produkte.length) {
+      document.getElementById('empty').style.display = 'block';
+      return;
+    }
+    produkte.forEach(function (p) {
+      var card = document.createElement('div');
+      card.className = 'card';
+
+      var row = document.createElement('div');
+      row.className = 'row';
+      var h3 = document.createElement('h3');
+      h3.textContent = p.name || '';
+      var price = document.createElement('div');
+      price.className = 'price';
+      price.textContent = typeof p.preis === 'number' ? fmtPreis(p.preis) : '';
+      row.appendChild(h3);
+      row.appendChild(price);
+      card.appendChild(row);
+
+      if (p.beschreibung) {
+        var desc = document.createElement('p');
+        desc.className = 'desc';
+        desc.textContent = p.beschreibung;
+        card.appendChild(desc);
+      }
+
+      if (p.tiers && p.tiers.length) {
+        var tiers = document.createElement('div');
+        tiers.className = 'tiers';
+        tiers.innerHTML = 'Mengenrabatt: ' + p.tiers.map(function (t) {
+          return '<span>ab ' + t.menge + ' Stk: ' + fmtPreis(t.preis) + '</span>';
+        }).join('');
+        card.appendChild(tiers);
+      }
+
+      list.appendChild(card);
+    });
+  }
+
+  fetch('preisliste.txt', { cache: 'no-store' })
+    .then(function (res) { return res.text(); })
+    .then(function (text) { render(parseProdukte(text)); })
+    .catch(function () {
+      document.getElementById('empty').style.display = 'block';
+    });
+</script>
+</body>
+</html>
