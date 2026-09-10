@@ -1,0 +1,68 @@
+# Preisliste für die Mini-App. Gleiches Format wie die produkte.txt vom Bot:
+# Jedes Produkt ist ein eigener Block: Name, Preis, Beschreibung, dazwischen
+# eine leere Zeile zum nächsten Produkt. Mengenrabatt optional, eigene Zeile.
+# Preis als Zahl mit Punkt oder Komma, z.B. 24.90 oder 24,90 (ohne "Fr.").
+#
+# WICHTIG: Diese Datei ist komplett unabhängig von produkte.txt und muss von
+# Hand aktuell gehalten werden (hier bearbeiten -> auf GitHub speichern ->
+# ist sofort live, kein Bot-Neustart nötig).
+
+Name: Retatrutide 20mg
+Preis: 95.00
+Beschreibung:
+Mengenrabatt: 3:90.00, 5:85.00, 10:79.00
+
+Name: Retatrutide 10mg
+Preis: 70.00
+Beschreibung:
+Mengenrabatt: 3:66.00, 5:62.00, 10:58.00
+
+Name: Tirzepatide 30mg
+Preis: 90.00
+Beschreibung:
+Mengenrabatt: 3:85.00, 5:80.00, 10:74.00
+
+Name: BPC157 10mg
+Preis: 50.00
+Beschreibung:
+Mengenrabatt: 3:47.00, 5:44.00, 10:41.00
+
+Name: TB500 10mg
+Preis: 75.00
+Beschreibung:
+Mengenrabatt: 3:71.00, 5:67.00, 10:62.00
+
+Name: GHK-Cu 50mg
+Preis: 35.00
+Beschreibung: 
+Mengenrabatt: 3:33.00, 5:31.00, 10:29.00
+
+Name: GHK-Cu 100mg
+Preis: 50.00
+Beschreibung: 
+Mengenrabatt: 3:47.00, 5:44.00, 10:41.00
+
+Name: HCG 5000iu
+Preis: 40.00
+Beschreibung: 
+Mengenrabatt: 3:37.00, 5:35.00, 10:33.00
+
+Name: MOTS-c 10mg
+Preis: 50.00
+Beschreibung: 
+Mengenrabatt: 3:47.00, 5:44.00, 10:41.00
+
+Name: KPV 30mg
+Preis: 75.00
+Beschreibung:
+Mengenrabatt: 3:71.00, 5:67.00, 10:62.00
+
+Name: Ipamorelin 10mg
+Preis: 50.00
+Beschreibung:
+Mengenrabatt: 3:47.00, 5:44.00, 10:41.00
+
+Name: KLOW 80mg
+Preis: 120.00
+Beschreibung:
+Mengenrabatt: 3:113.00, 5:107.00, 10:99.00
